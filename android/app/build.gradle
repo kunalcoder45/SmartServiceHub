@@ -116,4 +116,13 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    implementation "androidx.core:core-splashscreen:1.0.0"
+}
+configurations.all {
+    resolutionStrategy {
+        force 'androidx.core:core:1.13.1'
+        // block old support libraries
+        exclude group: 'com.android.support'
+    }
 }
