@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import UpperPart from '../../src/ui/upperPart';
 import LowerPart from '../../src/ui/lowerPart';
 
-const GetStarted = ({ navigation }) => {
+const GetStarted = ({ navigation, setIsAuthenticated }) => {
   return (
     <SafeAreaView className="flex-1 bg-black">
       <View className="flex-1 items-center justify-center bg-blue-600">

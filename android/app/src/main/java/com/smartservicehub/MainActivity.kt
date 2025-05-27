@@ -9,7 +9,8 @@ import android.os.Bundle
 class MainActivity : ReactActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(null) // This disables the default splash
+        setTheme(R.style.AppTheme)
+        super.onCreate(null)
     }
 
     /**

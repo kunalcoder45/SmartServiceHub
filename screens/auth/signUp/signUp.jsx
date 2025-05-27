@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+ import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,23 +6,47 @@ import {
   TouchableOpacity,
   Alert,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 
-const SignUp = () => {
+const API_URL = 'http://10.0.2.2:5000/api/auth/register';
+
+const SignUp = ({ setIsAuthenticated }) => {
   const navigation = useNavigation();
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     if (!username || !email || !password) {
       Alert.alert('Error', 'Please fill all fields');
       return;
     }
-    Alert.alert('Success', `Username: ${username}\nEmail: ${email}`);
+
+    setLoading(true);
+    try {
+      const res = await axios.post(API_URL, {
+        name: username,
+        email,
+        password,
+      });
+      Alert.alert('Success', res.data.message);
+      setIsAuthenticated (true);
+      navigation.navigate('Home');  // <-- Yahan navigate karo Home screen par
+    } catch (error) {
+      console.log(error.response?.data);
+      Alert.alert(
+        'Signup Failed',
+        error.response?.data?.message || 'Something went wrong'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleSignIn = () => {
@@ -37,7 +61,6 @@ const SignUp = () => {
         </View>
 
         <View className="flex-[7] bg-white rounded-t-3xl shadow-lg w-full p-8 pt-14">
-          {/* Username input */}
           <Text className="text-gray-700 mb-2 font-semibold text-lg">Username</Text>
           <TextInput
             className="border border-gray-300 rounded-full p-3 mb-4"
@@ -47,7 +70,6 @@ const SignUp = () => {
             autoCapitalize="none"
           />
 
-          {/* Email input */}
           <Text className="text-gray-700 mb-2 font-semibold text-lg">Email</Text>
           <TextInput
             className="border border-gray-300 rounded-full p-3 mb-4"
@@ -58,7 +80,6 @@ const SignUp = () => {
             autoCapitalize="none"
           />
 
-          {/* Password input */}
           <Text className="text-gray-700 mb-2 font-semibold text-lg">Password</Text>
           <TextInput
             className="border border-gray-300 rounded-full p-3 mb-6"
@@ -68,24 +89,26 @@ const SignUp = () => {
             onChangeText={setPassword}
           />
 
-          {/* Submit Button */}
           <TouchableOpacity
             className="bg-blue-600 py-3 rounded-full shadow-lg mb-4"
             onPress={handleSignUp}
+            disabled={loading}
           >
-            <Text className="text-white text-center font-semibold text-lg">
-              Sign Up
-            </Text>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text className="text-white text-center font-semibold text-lg">
+                Sign Up
+              </Text>
+            )}
           </TouchableOpacity>
 
-          {/* Already have account */}
           <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
             <Text className="text-center text-blue-600 font-semibold mb-6">
               Already have an account? Log in
             </Text>
           </TouchableOpacity>
 
-          {/* Google sign-in button */}
           <TouchableOpacity
             onPress={handleGoogleSignIn}
             className="flex-row items-center justify-center border border-gray-300 rounded-full py-3 mb-4"

@@ -6,22 +6,45 @@ import {
   TouchableOpacity,
   Alert,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 
-const SignUp = () => {
+const API_URL = 'http://10.0.2.2:5000/api/auth/login';
+
+const SignIn = ({ setIsAuthenticated }) => {
   const navigation = useNavigation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSignUp = () => {
+  const handleSignIn = async () => {
     if (!email || !password) {
       Alert.alert('Error', 'Please fill all fields');
       return;
     }
-    Alert.alert('Success', `Email: ${email}`);
+
+    setLoading(true);
+    try {
+      const res = await axios.post(API_URL, { email, password });
+      // Assuming backend sends back user info and token
+      Alert.alert('Success', `Welcome back, ${res.data.user.name || 'User'}!`);
+      // TODO: Save token securely (AsyncStorage or SecureStore)
+      // Navigate to home screen or dashboard
+      setIsAuthenticated(true);
+      navigation.navigate('Home');
+    } catch (error) {
+      console.log(error.response?.data);
+      Alert.alert(
+        'Login Failed',
+        error.response?.data?.message || 'Invalid credentials'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleSignIn = () => {
@@ -36,7 +59,6 @@ const SignUp = () => {
         </View>
 
         <View className="flex-[7] bg-white rounded-t-3xl shadow-lg w-full p-8 pt-14">
-
           {/* Email input */}
           <Text className="text-gray-700 mb-2 font-semibold text-lg">Email</Text>
           <TextInput
@@ -61,17 +83,22 @@ const SignUp = () => {
           {/* Submit Button */}
           <TouchableOpacity
             className="bg-blue-600 py-3 rounded-full shadow-lg mb-4"
-            onPress={handleSignUp}
+            onPress={handleSignIn}
+            disabled={loading}
           >
-            <Text className="text-white text-center font-semibold text-lg">
-              Sign Up
-            </Text>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text className="text-white text-center font-semibold text-lg">
+                Sign In
+              </Text>
+            )}
           </TouchableOpacity>
 
-          {/* Already have account */}
+          {/* Don't have account */}
           <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
             <Text className="text-center text-blue-600 font-semibold mb-6">
-              Don't have an account? Sing Up
+              Don't have an account? Sign Up
             </Text>
           </TouchableOpacity>
 
@@ -95,4 +122,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default SignIn;
