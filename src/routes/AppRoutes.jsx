@@ -3,13 +3,17 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Auth Screens
 import GetStarted from '../../screens/getStartted/getStarted';
 import SignIn from '../../screens/auth/signIn/signIn';
 import SignUp from '../../screens/auth/signUp/signUp';
-import Home from '../../screens/home/home';
+
+// Bottom Tab Navigator (Navbar)
+import Navbar from '../components/Navbar'; // ✅ Import your bottom tab navigator
 
 const Stack = createNativeStackNavigator();
 
+// 👤 Auth Stack
 const AuthStack = ({ setIsAuthenticated }) => (
   <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="SignIn">
     <Stack.Screen name="GetStarted">
@@ -24,19 +28,22 @@ const AuthStack = ({ setIsAuthenticated }) => (
   </Stack.Navigator>
 );
 
+// ✅ Main App Stack with Tab Navigator
 const AppStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="Home" component={Home} />
+    <Stack.Screen name="MainTabs" component={Navbar} />
   </Stack.Navigator>
 );
 
+
+// 🔁 Root Navigator
 const RootNavigator = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(null); // null = loading state
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
 
   useEffect(() => {
     const checkAuth = async () => {
       const token = await AsyncStorage.getItem('token');
-      setIsAuthenticated(!!token); // true if token exists
+      setIsAuthenticated(!!token);
     };
     checkAuth();
   }, []);
@@ -44,13 +51,15 @@ const RootNavigator = () => {
   const handleAuthChange = async (value) => {
     setIsAuthenticated(value);
     if (value) {
-      await AsyncStorage.setItem('token', 'dummy_token'); // You can use real token
+      await AsyncStorage.setItem('token', 'dummy_token');
     } else {
       await AsyncStorage.removeItem('token');
     }
   };
 
-  if (isAuthenticated === null) return null; // Or a loading spinner
+  if (isAuthenticated === null){
+    return null;
+  }
 
   return (
     <NavigationContainer>

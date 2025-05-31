@@ -1,4 +1,4 @@
- import React, { useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 
-const API_URL = 'http://10.0.2.2:5000/api/auth/register';
+import { BACKEND_URI } from '@env';
 
 const SignUp = ({ setIsAuthenticated }) => {
   const navigation = useNavigation();
@@ -22,6 +22,9 @@ const SignUp = ({ setIsAuthenticated }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // ✅ Full signup endpoint
+  const REGISTER_URL = `${BACKEND_URI}/auth/register`;
+
   const handleSignUp = async () => {
     if (!username || !email || !password) {
       Alert.alert('Error', 'Please fill all fields');
@@ -30,14 +33,14 @@ const SignUp = ({ setIsAuthenticated }) => {
 
     setLoading(true);
     try {
-      const res = await axios.post(API_URL, {
+      const res = await axios.post(REGISTER_URL, {
         name: username,
         email,
         password,
       });
       Alert.alert('Success', res.data.message);
-      setIsAuthenticated (true);
-      navigation.navigate('Home');  // <-- Yahan navigate karo Home screen par
+      setIsAuthenticated(true);
+      navigation.navigate('Home');
     } catch (error) {
       console.log(error.response?.data);
       Alert.alert(

@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 
-const API_URL = 'http://10.0.2.2:5000/api/auth/login';
+import { BACKEND_URI } from '@env';
 
 const SignIn = ({ setIsAuthenticated }) => {
   const navigation = useNavigation();
@@ -20,6 +20,9 @@ const SignIn = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // ✅ Construct full login URL
+  const LOGIN_URL = `${BACKEND_URI}/auth/login`;
 
   const handleSignIn = async () => {
     if (!email || !password) {
@@ -29,11 +32,8 @@ const SignIn = ({ setIsAuthenticated }) => {
 
     setLoading(true);
     try {
-      const res = await axios.post(API_URL, { email, password });
-      // Assuming backend sends back user info and token
+      const res = await axios.post(LOGIN_URL, { email, password });
       Alert.alert('Success', `Welcome back, ${res.data.user.name || 'User'}!`);
-      // TODO: Save token securely (AsyncStorage or SecureStore)
-      // Navigate to home screen or dashboard
       setIsAuthenticated(true);
       navigation.navigate('Home');
     } catch (error) {
