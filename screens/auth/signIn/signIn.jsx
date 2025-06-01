@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { BACKEND_URI } from '@env';
 
@@ -33,6 +34,11 @@ const SignIn = ({ setIsAuthenticated }) => {
     setLoading(true);
     try {
       const res = await axios.post(LOGIN_URL, { email, password });
+
+      // Store token & user
+      await AsyncStorage.setItem('userToken', res.data.token);
+      await AsyncStorage.setItem('userData', JSON.stringify(res.data.user));
+
       Alert.alert('Success', `Welcome back, ${res.data.user.name || 'User'}!`);
       setIsAuthenticated(true);
       navigation.navigate('Home');

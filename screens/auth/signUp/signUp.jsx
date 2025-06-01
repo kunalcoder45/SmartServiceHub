@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 import { BACKEND_URI } from '@env';
@@ -22,7 +23,6 @@ const SignUp = ({ setIsAuthenticated }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // ✅ Full signup endpoint
   const REGISTER_URL = `${BACKEND_URI}/auth/register`;
 
   const handleSignUp = async () => {
@@ -38,7 +38,12 @@ const SignUp = ({ setIsAuthenticated }) => {
         email,
         password,
       });
-      Alert.alert('Success', res.data.message);
+
+      // Store token & user data
+      await AsyncStorage.setItem('userToken', res.data.token);
+      await AsyncStorage.setItem('userData', JSON.stringify(res.data.user));
+
+      Alert.alert('Success', `Welcome, ${res.data.user.name || 'User'}!`);
       setIsAuthenticated(true);
       navigation.navigate('Home');
     } catch (error) {
